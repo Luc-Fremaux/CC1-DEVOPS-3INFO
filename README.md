@@ -12,4 +12,7 @@ Ce projet est destiné à valider les connaissances en DevOps des élèves de 3�
 4. Implémentez une github action pour déployer automatiquement le site sur un hebergement gratuit (Netlify)
 
 ## Test Results
-## Test Results
+## Test Results## Test Results
+**Tests passed:** 0
+**Tests failed:** 1
+**Total tests:** 1
