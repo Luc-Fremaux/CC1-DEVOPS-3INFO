@@ -48,3 +48,9 @@ jobs:
           git commit -m "Mise à jour des résultats des tests dans le README"
           git push origin master
         continue-on-error: true
+
+      - name: Debug test results
+        run: |
+          ls -lah  # Lister les fichiers du repo
+          find . -name "test-results.json" || echo "test-results.json NOT FOUND"
+          cat test-results.json || echo "File is missing or empty"
