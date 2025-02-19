@@ -1,10 +1,10 @@
-name: Run tests and update README
+name: MAIN
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
@@ -22,23 +22,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests and generate report
-        run: npm test -- --environment node --reporter json > test-results.json
+      - name: Run tests
+        run: npm test -- --reporter json --environment=node > test-results.json
 
-      - name: Extract test results
-        run: |
-          PASSED=$(jq '.summary.passed' test-results.json)
-          FAILED=$(jq '.summary.failed' test-results.json)
-          TOTAL=$(jq '.summary.total' test-results.json)
-          echo "Tests passed: $PASSED, Tests failed: $FAILED, Total tests: $TOTAL" > test-summary.txt
+      - name: Upload test results as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: test-results.json
 
-      - name: Update README with test results
-        run: |
-          TEST_RESULTS=$(cat test-summary.txt)
-          echo "## Test Results" >> README.md
-          echo "$TEST_RESULTS" >> README.md
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add README.md
-          git commit -m "Update README with test results"
-          git push origin master
+      - name: Display test results
+        run: cat test-results.json
