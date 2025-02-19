@@ -13,6 +13,3 @@ Ce projet est destiné à valider les connaissances en DevOps des élèves de 3�
 
 ## Test Results
 ## Test Results
-**Tests passed:** null
-**Tests failed:** null
-**Total tests:** null
