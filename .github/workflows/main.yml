@@ -1,10 +1,10 @@
-name: Run tests and update README
+name: MAIN
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
-    branches: [master]
+    branches: [ master ]
 
 jobs:
   build:
@@ -17,28 +17,25 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests and generate report
-        run: npm test -- --environment node --reporter json > test-results.json
+      - name: Run tests
+        run: npm test
 
-      - name: Extract test results
-        run: |
-          PASSED=$(jq '.summary.passed' test-results.json)
-          FAILED=$(jq '.summary.failed' test-results.json)
-          TOTAL=$(jq '.summary.total' test-results.json)
-          echo "Tests passed: $PASSED, Tests failed: $FAILED, Total tests: $TOTAL" > test-summary.txt
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Update README with test results
-        run: |
-          TEST_RESULTS=$(cat test-summary.txt)
-          echo "## Test Results" >> README.md
-          echo "$TEST_RESULTS" >> README.md
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add README.md
-          git commit -m "Update README with test results"
-          git push origin master
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v1
+        with:
+          publish-dir: ./dist
+          production-branch: master
+          netlify-token: ${{ secrets.NETLIFY_TOKEN }}
+          site-id: ${{ secrets.NETLIFY_SITE_ID }}
