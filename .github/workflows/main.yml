@@ -23,34 +23,28 @@ jobs:
         run: npm install
 
       - name: Run tests and generate report
-        run: npm test -- --reporter=json --outputFile=test-results.json
-      
-
-      - name: Extract test results
         run: |
-          PASSED=$(jq '.summary.passed' test-results.json)
-          FAILED=$(jq '.summary.failed' test-results.json)
-          TOTAL=$(jq '.summary.total' test-results.json)
-          echo "## Résultats des tests 🧪" > test-summary.md
-          echo "" >> test-summary.md
-          echo "- ✅ Tests réussis: $PASSED" >> test-summary.md
-          echo "- ❌ Tests échoués: $FAILED" >> test-summary.md
-          echo "- 🔢 Total des tests: $TOTAL" >> test-summary.md
-          echo "" >> test-summary.md
-          cat README.md >> test-summary.md
-          mv test-summary.md README.md
-
-      - name: Commit and push test results
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add README.md
-          git commit -m "Mise à jour des résultats des tests dans le README"
-          git push origin master
-        continue-on-error: true
+          npm test -- --reporter=json --outputFile=test-results.json || true
 
       - name: Debug test results
+        run: ls -lah && cat test-results.json || echo "File is missing"
+
+      - name: Update README with test results
         run: |
-          ls -lah  # Lister les fichiers du repo
-          find . -name "test-results.json" || echo "test-results.json NOT FOUND"
-          cat test-results.json || echo "File is missing or empty"
+          if [ -f test-results.json ]; then
+            PASSED=$(jq '.summary.passed' test-results.json)
+            FAILED=$(jq '.summary.failed' test-results.json)
+            TOTAL=$(jq '.summary.total' test-results.json)
+            echo "## Test Results" > test-summary.txt
+            echo "**Tests passed:** $PASSED" >> test-summary.txt
+            echo "**Tests failed:** $FAILED" >> test-summary.txt
+            echo "**Total tests:** $TOTAL" >> test-summary.txt
+            cat test-summary.txt >> README.md
+            git config --global user.name "GitHub Actions"
+            git config --global user.email "actions@github.com"
+            git add README.md
+            git commit -m "Update README with test results"
+            git push origin master
+          else
+            echo "Test results file not found, skipping README update."
+          fi
