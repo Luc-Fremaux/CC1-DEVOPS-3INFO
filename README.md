@@ -1,4 +1,3 @@
-![CI](https://github.com/Luc-Fremaux/CC1-DEVOPS-3INFO/actions/workflows/ci.yml/badge.svg)
 # DevOps Project
 
 Ce projet est destiné à valider les connaissances en DevOps des élèves de 3ème année d'informatique.
