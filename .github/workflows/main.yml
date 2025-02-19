@@ -22,5 +22,28 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests
-        run: npm test
+      - name: Run tests and generate report
+        run: npm test -- --environment node --reporter=json > test-results.json
+
+      - name: Extract test results
+        run: |
+          PASSED=$(jq '.summary.passed' test-results.json)
+          FAILED=$(jq '.summary.failed' test-results.json)
+          TOTAL=$(jq '.summary.total' test-results.json)
+          echo "## Résultats des tests 🧪" > test-summary.md
+          echo "" >> test-summary.md
+          echo "- ✅ Tests réussis: $PASSED" >> test-summary.md
+          echo "- ❌ Tests échoués: $FAILED" >> test-summary.md
+          echo "- 🔢 Total des tests: $TOTAL" >> test-summary.md
+          echo "" >> test-summary.md
+          cat README.md >> test-summary.md
+          mv test-summary.md README.md
+
+      - name: Commit and push test results
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add README.md
+          git commit -m "Mise à jour des résultats des tests dans le README"
+          git push origin master
+        continue-on-error: true
