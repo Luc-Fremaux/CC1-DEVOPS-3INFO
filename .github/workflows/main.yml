@@ -29,12 +29,12 @@ jobs:
       - name: Debug test results
         run: ls -lah && cat test-results.json || echo "File is missing"
 
-      - name: Update README with test results
+        - name: Update README with test results
         run: |
           if [ -f test-results.json ]; then
-            PASSED=$(jq '.summary.passed' test-results.json)
-            FAILED=$(jq '.summary.failed' test-results.json)
-            TOTAL=$(jq '.summary.total' test-results.json)
+            PASSED=$(jq '.numPassedTests' test-results.json)
+            FAILED=$(jq '.numFailedTests' test-results.json)
+            TOTAL=$(jq '.numTotalTests' test-results.json)
             echo "## Test Results" > test-summary.txt
             echo "**Tests passed:** $PASSED" >> test-summary.txt
             echo "**Tests failed:** $FAILED" >> test-summary.txt
